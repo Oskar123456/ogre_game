@@ -6,14 +6,36 @@
 #include "Ogre.h"
 #include "OgreApplicationContext.h"
 
+Ogre::Root* root;
+Ogre::SceneManager* scnMgr;
+
 //! [key_handler]
 class KeyHandler : public OgreBites::InputListener
 {
     bool keyPressed(const OgreBites::KeyboardEvent& evt) override
     {
-        if (evt.keysym.sym == OgreBites::SDLK_ESCAPE)
-        {
+        if (evt.keysym.sym == OgreBites::SDLK_ESCAPE) {
             Ogre::Root::getSingleton().queueEndRendering();
+        }
+        if (evt.keysym.sym == OgreBites::SDLK_PAGEUP) {
+            Ogre::Camera* cam = scnMgr->getCamera("MainCamera");
+            Ogre::SceneNode* cam_ns = cam->getParentSceneNode();
+            cam_ns->translate(Ogre::Vector3(0, 0.3f, 0));
+        }
+        if (evt.keysym.sym == OgreBites::SDLK_PAGEDOWN) {
+            Ogre::Camera* cam = scnMgr->getCamera("MainCamera");
+            Ogre::SceneNode* cam_ns = cam->getParentSceneNode();
+            cam_ns->translate(Ogre::Vector3(0, -0.3f, 0));
+        }
+        if (evt.keysym.sym == OgreBites::SDLK_UP) {
+            Ogre::Camera* cam = scnMgr->getCamera("MainCamera");
+            Ogre::SceneNode* cam_ns = cam->getParentSceneNode();
+            cam_ns->translate(Ogre::Vector3(0, 0, -0.3f));
+        }
+        if (evt.keysym.sym == OgreBites::SDLK_DOWN) {
+            Ogre::Camera* cam = scnMgr->getCamera("MainCamera");
+            Ogre::SceneNode* cam_ns = cam->getParentSceneNode();
+            cam_ns->translate(Ogre::Vector3(0, 0, 0.3f));
         }
         return true;
     }
@@ -29,8 +51,8 @@ int main(int argc, char *argv[])
 
 //! [setup]
     // get a pointer to the already created root
-    Ogre::Root* root = ctx.getRoot();
-    Ogre::SceneManager* scnMgr = root->createSceneManager();
+    root = ctx.getRoot();
+    scnMgr = root->createSceneManager();
 
     // register our scene with the RTSS
     Ogre::RTShader::ShaderGenerator* shadergen = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
@@ -48,7 +70,7 @@ int main(int argc, char *argv[])
     camNode->lookAt(Ogre::Vector3(0, 0, -1), Ogre::Node::TS_PARENT);
 
     // create the camera
-    Ogre::Camera* cam = scnMgr->createCamera("myCam");
+    Ogre::Camera* cam = scnMgr->createCamera("MainCamera");
     cam->setNearClipDistance(5); // specific to this sample
     cam->setAutoAspectRatio(true);
     camNode->attachObject(cam);
@@ -60,6 +82,13 @@ int main(int argc, char *argv[])
     Ogre::Entity* ent = scnMgr->createEntity("Sinbad.mesh");
     Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode();
     node->attachObject(ent);
+
+    Ogre::Entity* ninjaEntity = scnMgr->createEntity("ninja.mesh");
+    ninjaEntity->setCastShadows(true);
+    Ogre::SceneNode* ninja_node = scnMgr->getRootSceneNode()->createChildSceneNode();
+    ninja_node->translate(Ogre::Vector3(2, 0, 2));
+
+    ninja_node->attachObject(ninjaEntity);
 //! [setup]
 
 //! [main]
